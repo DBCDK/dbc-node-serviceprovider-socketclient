@@ -1,0 +1,24 @@
+# ============
+# LOGS / REPORTS
+# ============
+output
+npm-debug.log
+
+# ============
+# BUILDS
+# ============
+public/*
+
+# ============
+# NODE_MODULES
+# ============
+node_modules
+
+
+# ============
+# IDEA
+# ============
+.idea
+*.iml
+
+
