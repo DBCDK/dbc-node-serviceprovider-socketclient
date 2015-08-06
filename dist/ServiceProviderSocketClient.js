@@ -9,13 +9,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _dbcNodeNewrelicWrapper = require('dbc-node-newrelic-wrapper');
 
+var dbcrelic = _interopRequireWildcard(_dbcNodeNewrelicWrapper);
+
 /**
  * A dummy socket client used for server side rendering.
  * @type {{on: Function, emit: Function}}
  */
-
-var dbcrelic = _interopRequireWildcard(_dbcNodeNewrelicWrapper);
-
 var serverSideSocketDummy = {
   on: function on() {},
   emit: function emit() {}

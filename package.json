@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "Clientside Service Provider Client",
   "main": "dist/index.js",
-  "dependencies": {
-    "dbc-node-newrelic-wrapper": "git://github.com/DBCDK/dbc-node-newrelic-wrapper#stable_dist"
-  },
   "scripts": {
     "build": "npm run cleardist && babel ./src -d dist --ignore __tests__",
     "cleardist": "rm -rf ./dist",
@@ -31,6 +28,10 @@
     "url": "https://github.com/DBCDK/dbc-node-serviceprovider-socketclient/issues"
   },
   "homepage": "https://github.com/DBCDK/dbc-node-serviceprovider-socketclient#readme",
+  "dependencies": {
+    "dbc-node-newrelic-wrapper": "git://github.com/DBCDK/dbc-node-newrelic-wrapper#stable_dist",
+    "socket.io-client": "^1.3.6"
+  },
   "devDependencies": {
     "babel": "^5.8.20",
     "babel-core": "^5.8.20",
