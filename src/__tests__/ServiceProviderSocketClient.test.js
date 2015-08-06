@@ -1,9 +1,12 @@
 'use strict';
 
-import {assert} from 'chai';
+import SocketClient from '../ServiceProviderSocketClient.js';
+import {expect} from 'chai';
 
 describe('Testing ServiceProviderSocketClient', () => {
-  it('Test test', () => {
-    assert.isTrue(true);
+
+  it('Ensure we get the expected methods returned from constructor', () => {
+    const socketClient = SocketClient();
+    expect(socketClient).to.have.all.keys(['addListener', 'request', 'response']);
   });
 });
