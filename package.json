@@ -1,6 +1,6 @@
 {
   "name": "dbc-node-serviceprovider-socketclient",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Clientside Service Provider Client",
   "main": "dist/index.js",
   "scripts": {
