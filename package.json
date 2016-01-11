@@ -9,9 +9,9 @@
     "lint": "eslint ./src",
     "lint:checkstyle": "eslint ./src  -o report.xml -f checkstyle",
     "reinstall": "rm -r node_modules && npm install",
-    "test": "mocha --compilers js:babel/register src/__tests__",
+    "test": "mocha --compilers js:babel/register src/__tests__ -R mocha-jenkins-reporter",
     "test:watch": "mocha --compilers js:babel/register src/__tests__ -w",
-    "test:junit": "mocha --compilers js:babel/register src/__tests__ -R mocha-jenkins-reporter",
+    "test:junit": "npm run test",
     "watch": "npm run cleardist && babel ./src --watch -d dist --ignore __tests__"
   },
   "repository": {
