@@ -17,7 +17,12 @@ const serverSideSocketDummy = {
  * socket.io-client cannot be loaded on the server, so if window object
  * @type {boolean|{on: Function, emit: Function}}
  */
-const socket = typeof window !== 'undefined' && require('socket.io-client').connect() || serverSideSocketDummy;
+// const socket = typeof window !== 'undefined' && require('socket.io-client').connect() || serverSideSocketDummy;
+const socket = typeof window !== 'undefined' && require('socketcluster-client').connect() || serverSideSocketDummy;
+
+if (typeof window !== 'undefined') {
+  window.socket = socket;
+}
 
 /**
  * Reqistrer an event for the ServiceProvider
