@@ -13,15 +13,70 @@ const serverSideSocketDummy = {
   }
 };
 
-/**
- * socket.io-client cannot be loaded on the server, so if window object
- * @type {boolean|{on: Function, emit: Function}}
- */
-// const socket = typeof window !== 'undefined' && require('socket.io-client').connect() || serverSideSocketDummy;
-const socket = typeof window !== 'undefined' && require('socketcluster-client').connect() || serverSideSocketDummy;
+let socket;
+const clientHttpApiFallback = {
+  listeners: [],
+  on: function (event, cb) {
+    socket.listeners.push({event: event, callback: cb});
+  },
+  emit: function (event, data) {
+    let cleanEvent = event.replace('Request', '');
+    let xmlhttp = new XMLHttpRequest();
 
-if (typeof window !== 'undefined') {
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState === 4) {
+        socket.listeners.forEach((listener) => {
+          if (listener.event === cleanEvent + 'Response') {
+            JSON.parse(xmlhttp.responseText).forEach((resp) => {
+              resp.forEach((res) => {
+                listener.callback(res);
+              });
+            });
+          }
+        });
+      }
+    };
+
+    xmlhttp.open('POST', '/api/' + cleanEvent);
+    xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xmlhttp.send(JSON.stringify([data]));
+  }
+};
+
+/**
+ * Checks whether client has websockets.
+ * Based on modernizr check
+ * @returns truthy
+ */
+function checkWebSocket() {
+  let protocol = 'https:' === location.protocol ? 'wss' : 'ws'; // eslint-disable-line
+  let protoBin;
+
+  if ('WebSocket' in window) {
+    if (protoBin = 'binaryType' in WebSocket.prototype) { // eslint-disable-line
+      return protoBin;
+    }
+    try {
+      return !!(new WebSocket(protocol + '://.').binaryType);
+    }
+    catch (e) {} // eslint-disable-line
+  }
+
+  return false;
+}
+
+if (typeof window !== 'undefined' && ('WebSocket' in window || 'MozWebSocket' in window)) {
+  if (checkWebSocket()) {
+    socket = require('socketcluster-client').connect();
+  }
+  else {
+    socket = clientHttpApiFallback;
+  }
+
   window.socket = socket;
+}
+else {
+  socket = serverSideSocketDummy;
 }
 
 /**

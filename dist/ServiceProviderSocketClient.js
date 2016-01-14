@@ -20,15 +20,68 @@ var serverSideSocketDummy = {
   emit: function emit() {}
 };
 
-/**
- * socket.io-client cannot be loaded on the server, so if window object
- * @type {boolean|{on: Function, emit: Function}}
- */
-// const socket = typeof window !== 'undefined' && require('socket.io-client').connect() || serverSideSocketDummy;
-var socket = typeof window !== 'undefined' && require('socketcluster-client').connect() || serverSideSocketDummy;
+var socket = undefined;
+var clientHttpApiFallback = {
+  listeners: [],
+  on: function on(event, cb) {
+    socket.listeners.push({ event: event, callback: cb });
+  },
+  emit: function emit(event, data) {
+    var cleanEvent = event.replace('Request', '');
+    var xmlhttp = new XMLHttpRequest();
 
-if (typeof window !== 'undefined') {
+    xmlhttp.onreadystatechange = function () {
+      if (xmlhttp.readyState === 4) {
+        socket.listeners.forEach(function (listener) {
+          if (listener.event === cleanEvent + 'Response') {
+            JSON.parse(xmlhttp.responseText).forEach(function (resp) {
+              resp.forEach(function (res) {
+                listener.callback(res);
+              });
+            });
+          }
+        });
+      }
+    };
+
+    xmlhttp.open('POST', '/api/' + cleanEvent);
+    xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xmlhttp.send(JSON.stringify([data]));
+  }
+};
+
+/**
+ * Checks whether client has websockets.
+ * Based on modernizr check
+ * @returns truthy
+ */
+function checkWebSocket() {
+  var protocol = 'https:' === location.protocol ? 'wss' : 'ws'; // eslint-disable-line
+  var protoBin = undefined;
+
+  if ('WebSocket' in window) {
+    if (protoBin = 'binaryType' in WebSocket.prototype) {
+      // eslint-disable-line
+      return protoBin;
+    }
+    try {
+      return !!new WebSocket(protocol + '://.').binaryType;
+    } catch (e) {} // eslint-disable-line
+  }
+
+  return false;
+}
+
+if (typeof window !== 'undefined' && ('WebSocket' in window || 'MozWebSocket' in window)) {
+  if (checkWebSocket()) {
+    socket = require('socketcluster-client').connect();
+  } else {
+    socket = clientHttpApiFallback;
+  }
+
   window.socket = socket;
+} else {
+  socket = serverSideSocketDummy;
 }
 
 /**
