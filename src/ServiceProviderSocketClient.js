@@ -24,7 +24,7 @@ const clientHttpApiFallback = {
     let xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState === 4) {
+      if (xmlhttp.readyState === 4 && xmlhttp.status !== 500 && xmlhttp.status !== 404) {
         socket.listeners.forEach((listener) => {
           if (listener.event === cleanEvent + 'Response') {
             JSON.parse(xmlhttp.responseText).forEach((resp) => {
