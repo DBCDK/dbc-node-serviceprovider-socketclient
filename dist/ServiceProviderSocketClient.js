@@ -26,6 +26,7 @@ var clientHttpApiFallback = {
   on: function on(event, cb) {
     socket.listeners.push({ event: event, callback: cb });
   },
+  off: function off() {},
   emit: function emit(event, data) {
     var cleanEvent = event.replace('Request', '');
     var xmlhttp = new XMLHttpRequest();
@@ -110,10 +111,16 @@ function ServiceProviderSocketClient(event) {
 
   function response(cb) {
     var responseEvent = event + 'Response';
-    socket.on(responseEvent, function (data) {
+    var onResponse = function onResponse(data) {
       cb(data);
       dbcrelic.addPageAction(responseEvent, { response: data });
-    });
+    };
+    socket.on(responseEvent, onResponse);
+    return {
+      off: function off() {
+        socket.off(responseEvent, onResponse);
+      }
+    };
   }
 
   return {
