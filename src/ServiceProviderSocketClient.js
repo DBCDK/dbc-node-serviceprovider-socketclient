@@ -91,6 +91,8 @@ else {
  * @constructor
  */
 export default function ServiceProviderSocketClient(event) {
+  let listening = false;
+
   function request(data) {
     const requestEvent = event + 'Request';
     socket.emit(requestEvent, data);
@@ -115,9 +117,23 @@ export default function ServiceProviderSocketClient(event) {
     };
   }
 
+  /**
+   * Adds ONE (and only one) listener to this socket.
+   * @param cb
+   * @returns {*}
+   */
+  function responseOnce(cb) {
+    if (!listening) {
+      listening = response(cb);
+    }
+
+    return listening;
+  }
+
   return {
     addListener,
     request,
-    response
+    response,
+    responseOnce
   };
 }

@@ -97,6 +97,8 @@ if (typeof window !== 'undefined' && ('WebSocket' in window || 'MozWebSocket' in
  */
 
 function ServiceProviderSocketClient(event) {
+  var listening = false;
+
   function request(data) {
     var requestEvent = event + 'Request';
     socket.emit(requestEvent, data);
@@ -123,10 +125,24 @@ function ServiceProviderSocketClient(event) {
     };
   }
 
+  /**
+   * Adds ONE (and only one) listener to this socket.
+   * @param cb
+   * @returns {*}
+   */
+  function responseOnce(cb) {
+    if (!listening) {
+      listening = response(cb);
+    }
+
+    return listening;
+  }
+
   return {
     addListener: addListener,
     request: request,
-    response: response
+    response: response,
+    responseOnce: responseOnce
   };
 }
 
