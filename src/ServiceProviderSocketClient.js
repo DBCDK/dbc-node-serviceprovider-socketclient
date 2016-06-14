@@ -137,7 +137,7 @@ export default function ServiceProviderSocketClient(event) {
         try {
           cb(JSON.parse(msg));
         }
-        catch(e) {
+        catch (e) {
           console.error(e); // eslint-disable-line no-console
         }
       }
