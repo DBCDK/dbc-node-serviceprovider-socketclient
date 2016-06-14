@@ -130,8 +130,19 @@ export default function ServiceProviderSocketClient(event) {
     return listening;
   }
 
+  function subscribe(channel, cb) {
+    socket.subscribe(channel, () => {
+      socket.on('message', (msgChannel, data) => {
+        if (channel === msgChannel) {
+          cb(data);
+        }
+      });
+    });
+  }
+
   return {
     addListener,
+    subscribe,
     request,
     response,
     responseOnce
