@@ -138,8 +138,19 @@ function ServiceProviderSocketClient(event) {
     return listening;
   }
 
+  function subscribe(channel, cb) {
+    socket.subscribe(channel, function () {
+      socket.on('message', function (msgChannel, data) {
+        if (channel === msgChannel) {
+          cb(data);
+        }
+      });
+    });
+  }
+
   return {
     addListener: addListener,
+    subscribe: subscribe,
     request: request,
     response: response,
     responseOnce: responseOnce
