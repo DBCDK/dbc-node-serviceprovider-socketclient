@@ -131,12 +131,16 @@ export default function ServiceProviderSocketClient(event) {
   }
 
   function subscribe(channel, cb) {
-    socket.subscribe(channel, () => {
-      socket.on('message', (msgChannel, data) => {
-        if (channel === msgChannel) {
-          cb(data);
+    socket.subscribe(channel);
+    socket.on('message', (msg) => {
+      if (msg.indexOf(`"channel":"${channel}"`) >= 0) {
+        try {
+          cb(JSON.parse(msg));
         }
-      });
+        catch (e) {
+          console.error(e); // eslint-disable-line no-console
+        }
+      }
     });
   }
 
